@@ -27,8 +27,8 @@ class Api::Json::ImportsController < Api::ApplicationController
       #@data_import = Resque::ImporterJobs.process(current_user[:id], params[:table_name], file_uri)
       #render :json => {:item_queue_id => job_meta.meta_id, :success => true}
     else
-      job = Resque::ImporterJobs.enqueue(current_user[:id], table_name, file_uri, table_id, append, nil, table_copy, from_query)
-      render_jsonp({:item_queue_id => job.meta_id, :success => true})
+      job_id = ImportWorker.perform_async(current_user[:id], table_name, file_uri, table_id, append, nil, table_copy, from_query)
+      render_jsonp({:item_queue_id => job_id, :success => true})
     end
   #rescue => e
   #  render_jsonp({ :description => e.message, :code => (@data_import.error_code rescue '') }, 400)
